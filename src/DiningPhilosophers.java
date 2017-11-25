@@ -24,7 +24,7 @@ public class DiningPhilosophers implements Runnable {
 	 * @param time
 	 * @param errMsg
 	 */
-	private static void delay(long time, String errMsg) {
+	public static void delay(long time, String errMsg) {
 		long sleepTime = Math.max(1, time);
 		try {
 			Thread.sleep(sleepTime);

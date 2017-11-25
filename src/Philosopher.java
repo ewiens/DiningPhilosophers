@@ -2,7 +2,7 @@
 public class Philosopher implements Runnable{
 	
 	private Thread philosopherThread;
-	private volatile Boolean eating;
+	private volatile Boolean dining;
 	private int eatCount;
 	private static Chopstick[] chopsticks;
 	private Chopstick chopstick1;
@@ -12,7 +12,7 @@ public class Philosopher implements Runnable{
 		chopsticks = allChopsticks;
 		eatCount = 0;
 		
-		eating = true;
+		dining = true;
 		philosopherThread = new Thread(this,"Philosopher "+name);
 		philosopherThread.start();
 		
@@ -21,25 +21,38 @@ public class Philosopher implements Runnable{
 	@Override
 	public void run() {
 //		System.out.println(philosopherThread.getName()+" has started ");
-		while(eating){
-			try{
-				getSomeChopsticks();
+		while(dining) {
+			philosophize();
+			eat();
+		}
+			
+	}
+	
+	public void philosophize() {
+		long randomTime = getTime();
+		DiningPhilosophers.delay(randomTime, "error while philosopher " + philosopherThread.getName()+ "tried to philosophize");
+	}
+	
+	public void eat() {
+		long randomTime = getTime();
+		try{
+			getSomeChopsticks();
 //					System.out.println(philosopherThread.getName()+" ate");
-				eatCount++;
-			}catch(Exception e){
-				System.out.println(philosopherThread.getName()+" could not get a chopstick");
-				e.printStackTrace();
-			}finally{
-				if(chopstick1.isAcquired()){
-					chopstick1.release();
-					chopstick2.release();			
-				}
+			eatCount++;
+			DiningPhilosophers.delay(randomTime, "error while philosopher " + philosopherThread.getName()+ "tried to eat");
+		}catch(Exception e){
+			System.out.println(philosopherThread.getName()+" could not get a chopstick");
+			e.printStackTrace();
+		}finally{
+			if(chopstick1.isAcquired()){
+				chopstick1.release();
+				chopstick2.release();			
 			}
-		}			
+		}
 	}
 	
 	public void stopPhilosopher(){
-		eating = false;
+		dining = false;
 	}
 	
 	public int getEatCount(){
@@ -54,6 +67,11 @@ public class Philosopher implements Runnable{
 			e.printStackTrace();
 		}
 
+	}
+	
+	private long getTime() {
+		//random time between 0 and 10
+		return (long) (Math.random()*10);
 	}
 	
 	private synchronized void getSomeChopsticks() {
