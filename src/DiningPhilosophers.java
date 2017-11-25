@@ -51,38 +51,40 @@ public class DiningPhilosophers implements Runnable {
 	@Override
 	public void run() {
 		System.out.println("Main thread started");
-		
+
+		// Create the chopsticks
 		Chopstick[] chopsticks = new Chopstick[PHILOSOPHER_COUNT];
 		for (int i = 0; i<PHILOSOPHER_COUNT; i++){
 			chopsticks[i] = new Chopstick(i);
 		}
 
 		// Create the philosophers
-		// doing this with a counter to pass in the chopstick numbers
+		// doing this with a counter to pass in the philosopher numbers
 		Philosopher[] philosophers = new Philosopher[PHILOSOPHER_COUNT];
 		for (int i = 0; i<PHILOSOPHER_COUNT; i++){
 			philosophers[i] = new Philosopher(""+i,chopsticks); //i, i+1 mod 5 
 			
 		}
 		// chill out here
-		while(isDining){
-			try {
-				this.wait();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+		while(isDining){ // This wasn't working on my computer. returned an IllegalMonitorStateException on thread "table"
+//			try {
+//				this.wait();
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
 		}
 		
 		// stop the philosophers
 		for(Philosopher p: philosophers){
 			p.stopPhilosopher();
 		}
-		
 		for(Philosopher p: philosophers){
 			p.waitToStopPhilosopher();
 		}
 
-		
+		for(Philosopher p: philosophers){
+			p.getEatCount();
+		}
 	}
 	
 	/**
@@ -90,7 +92,7 @@ public class DiningPhilosophers implements Runnable {
 	 */
 	public void stopDining(){
 		isDining = false;
-		this.notifyAll();
+//		this.notifyAll();
 	}
 	
 	public void waitToStop() {

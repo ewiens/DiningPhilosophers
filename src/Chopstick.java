@@ -5,6 +5,7 @@ public class Chopstick {
 	
 	Chopstick(int n) {
 		chopStickNum = n;
+		acquired = false;
 	}
 	
 	public synchronized void acquire() {
