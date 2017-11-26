@@ -5,7 +5,7 @@ public class DiningPhilosophers implements Runnable {
 
 
 	/**
-	 * makes a new DiningPhilosopher class and delays for the amojnt of time specified. Then stops the threads
+	 * makes a new DiningPhilosopher class and delays for the amount of time specified. Then stops the threads
 	 * @param args
 	 */
 	public static void main(String[] args){
@@ -19,10 +19,12 @@ public class DiningPhilosophers implements Runnable {
 	}
 	
 	/**
-	 * from Plant
+	 * simple delay method
 	 * 
 	 * @param time
+	 *            how long in ms to sleep for
 	 * @param errMsg
+	 *            error message to print if something goes wrong.
 	 */
 	public static void delay(long time, String errMsg) {
 		long sleepTime = Math.max(1, time);
@@ -48,6 +50,10 @@ public class DiningPhilosophers implements Runnable {
 		thread.start();
 	}
 
+	
+	/**
+	 * the main thread. This thread creates all objects, and ends them at the appropriate time. Further detail is inside the method.
+	 */
 	@Override
 	public void run() {
 		System.out.println("Main thread started");
@@ -66,12 +72,12 @@ public class DiningPhilosophers implements Runnable {
 			
 		}
 		// chill out here
-		while(isDining){ // This wasn't working on my computer. returned an IllegalMonitorStateException on thread "table"
-//			try {
-//				this.wait();
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
+		try {
+			synchronized(this) {
+				this.wait();
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 		
 		// stop the philosophers
@@ -82,19 +88,24 @@ public class DiningPhilosophers implements Runnable {
 			p.waitToStopPhilosopher();
 		}
 
+		//get the eat count
 		for(Philosopher p: philosophers){
 			p.getEatCount();
 		}
 	}
 	
 	/**
-	 * Stop the table thread
+	 * Stops the table thread
 	 */
 	public void stopDining(){
-		isDining = false;
-//		this.notifyAll();
+		synchronized(this) {
+			this.notifyAll();
+		}
 	}
 	
+	/**
+	 * joins this thread
+	 */
 	public void waitToStop() {
 		try {
 			thread.join();
