@@ -61,7 +61,7 @@ public class Philosopher implements Runnable{
 	public void eat() {
 		long randomTime = getTime();
 		try{
-			getSomeChopsticks();
+			getSomeChopsticks(chopstick1,chopstick2);
 			eatCount++;
 			DiningPhilosophers.delay(randomTime, "error while philosopher " + philosopherThread.getName()+ "tried to eat");
 		}catch(Exception e){
@@ -117,7 +117,7 @@ public class Philosopher implements Runnable{
 	 * If one of the chopsticks is currently acquired, the philosopher will wait for it. There is no circular dependency because
 	 * the first philosopher will always get his/her two chopsticks.
 	 */
-	private synchronized void getSomeChopsticks() {
+	private static synchronized void getSomeChopsticks(Chopstick chopstick1, Chopstick chopstick2) {
 		//acquire the left and right chopstick
 		chopstick1.acquire();
 		chopstick2.acquire();
