@@ -1,7 +1,7 @@
 public class DiningPhilosophers implements Runnable {
 
  
-	public static int EATING_TIME = 1*1000; // runs for x seconds x*1000 milliseconds
+	public static int EATING_TIME = 5*1000; // runs for x seconds x*1000 milliseconds
 
 
 	/**

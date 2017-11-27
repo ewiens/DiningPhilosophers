@@ -6,7 +6,6 @@ public class Philosopher implements Runnable{
 	private Thread philosopherThread;
 	private volatile Boolean dining;
 	private int eatCount;
-	private static Chopstick[] chopsticks;
 	private Chopstick chopstick1;
 	private Chopstick chopstick2;
 	
@@ -17,16 +16,15 @@ public class Philosopher implements Runnable{
 	 * @param allChopsticks - the set of all chopsticks. Should have been passed to all philosophers
 	 */
 	Philosopher(int name, Chopstick[] allChopsticks){ 
-		chopsticks = allChopsticks;
-		int myChopstick1 = name;
-		int myChopstick2 = (name+1)%5;
+		int numberOfChopstickOne = name;
+		int numberOfChopstickTwo = (name+1)%5;
 		
-		if(myChopstick1>myChopstick2){
-			chopstick1 = chopsticks[myChopstick2];
-			chopstick2 = chopsticks[myChopstick1];
+		if(numberOfChopstickOne>numberOfChopstickTwo){
+			chopstick1 = allChopsticks[numberOfChopstickTwo];
+			chopstick2 = allChopsticks[numberOfChopstickOne];
 		}else{
-			chopstick1 = chopsticks[myChopstick1];
-			chopstick2 = chopsticks[myChopstick2];
+			chopstick1 = allChopsticks[numberOfChopstickOne];
+			chopstick2 = allChopsticks[numberOfChopstickTwo];
 		}
 
 		eatCount = 0;
@@ -42,7 +40,6 @@ public class Philosopher implements Runnable{
 	 * while we haven't been told to stop dining, philosophize and eat.
 	 */
 	public void run() {
-//		System.out.println(philosopherThread.getName()+" has started ");
 		while(dining) {
 			philosophize();
 			eat();
@@ -65,7 +62,6 @@ public class Philosopher implements Runnable{
 		long randomTime = getTime();
 		try{
 			getSomeChopsticks();
-//					System.out.println(philosopherThread.getName()+" ate");
 			eatCount++;
 			DiningPhilosophers.delay(randomTime, "error while philosopher " + philosopherThread.getName()+ "tried to eat");
 		}catch(Exception e){
@@ -116,24 +112,14 @@ public class Philosopher implements Runnable{
 	}
 	
 	/**
-	 * acquires two chopsticks. Does so by checking all even indexes of chopsticks. If the even index is not acquired, then acquire that
-	 * chopstick and the next one as well. This gives an atomic interaction between the philosopher. 
-	 * The philosopher will keep trying to get a chopstick until they are successful.
+	 * acquires two chopsticks. Does so by checking the left chopstick. If left is not acquired, grab it and the right. 
+	 * This avoids deadlock because this method is synchronized. No two philosophers will attempt to grab chop sticks at the same time.
+	 * If one of the chopsticks is currently acquired, the philosopher will wait for it. There is no circular dependency because
+	 * the first philosopher will always get his/her two chopsticks.
 	 */
 	private synchronized void getSomeChopsticks() {
-		boolean iDontHaveChopsticks = true;
-		//the philosopher will just keep trying until he/she gets two chopsticks
-		while (iDontHaveChopsticks) {
-			//if it isn't acquired
-			if(!(chopstick1.isAcquired())) {
-				//acquire this chopstick and the next one
-				chopstick1.acquire();
-				chopstick2.acquire(); //mod 5 since there is no chopstick 6
-				
-				iDontHaveChopsticks = false;
-				break; // We need to break out of the for loop (we don't need to check the rest of the chopsticks if we have a set)
-			}
-		}
-				
+		//acquire the left and right chopstick
+		chopstick1.acquire();
+		chopstick2.acquire();
 	}
 }
