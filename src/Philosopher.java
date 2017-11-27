@@ -16,8 +16,19 @@ public class Philosopher implements Runnable{
 	 * @param name - the name of the philosopher
 	 * @param allChopsticks - the set of all chopsticks. Should have been passed to all philosophers
 	 */
-	Philosopher(String name, Chopstick[] allChopsticks){ 
+	Philosopher(int name, Chopstick[] allChopsticks){ 
 		chopsticks = allChopsticks;
+		int myChopstick1 = name;
+		int myChopstick2 = (name+1)%5;
+		
+		if(myChopstick1>myChopstick2){
+			chopstick1 = chopsticks[myChopstick2];
+			chopstick2 = chopsticks[myChopstick1];
+		}else{
+			chopstick1 = chopsticks[myChopstick1];
+			chopstick2 = chopsticks[myChopstick2];
+		}
+
 		eatCount = 0;
 		
 		dining = true;
@@ -113,29 +124,16 @@ public class Philosopher implements Runnable{
 		boolean iDontHaveChopsticks = true;
 		//the philosopher will just keep trying until he/she gets two chopsticks
 		while (iDontHaveChopsticks) {
-			
-			//if there are odd chopsticks, we can only look at n-1 of the chopsticks
-			int numLoops = chopsticks.length-chopsticks.length%2;
-			
-			//if we just go up by two every time and check that way, we are essentially treating  it like it is ordered and atomic
-			for (int i = 0;i<numLoops;i+=2) {
-				//if it isn't acquired
-				if(!(chopsticks[i].isAcquired())) {
-					
-					//System.out.println(philosopherThread.getName()+" got chopsticks "+i+(i+1)%5);
-
-					//acquire this chopstick and the next one
-					chopsticks[i].acquire();
-					chopsticks[i+1].acquire(); //mod 5 since there is no chopstick 6
-
-					chopstick1 = chopsticks[i];
-					chopstick2 = chopsticks[i+1];
-					
-					iDontHaveChopsticks = false;
-					break; // We need to break out of the for loop (we don't need to check the rest of the chopsticks if we have a set)
-				}
-			}
+			//if it isn't acquired
+			if(!(chopstick1.isAcquired())) {
+				//acquire this chopstick and the next one
+				chopstick1.acquire();
+				chopstick2.acquire(); //mod 5 since there is no chopstick 6
 				
+				iDontHaveChopsticks = false;
+				break; // We need to break out of the for loop (we don't need to check the rest of the chopsticks if we have a set)
+			}
 		}
+				
 	}
 }

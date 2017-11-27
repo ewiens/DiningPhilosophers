@@ -68,7 +68,7 @@ public class DiningPhilosophers implements Runnable {
 		// doing this with a counter to pass in the philosopher numbers
 		Philosopher[] philosophers = new Philosopher[PHILOSOPHER_COUNT];
 		for (int i = 0; i<PHILOSOPHER_COUNT; i++){
-			philosophers[i] = new Philosopher(""+i,chopsticks); //i, i+1 mod 5 
+			philosophers[i] = new Philosopher(i,chopsticks); //i, i+1 mod 5 
 			
 		}
 		// chill out here
