@@ -1,6 +1,6 @@
 
 public class Chopstick {
-	private int chopStickNum;
+	public int chopStickNum;
 	private boolean acquired;
 	
 	Chopstick(int n) {
@@ -8,19 +8,20 @@ public class Chopstick {
 		acquired = false;
 	}
 	
-	public synchronized void acquire() {
-		while (acquired) {
-			try {
-				wait();
-			} catch (InterruptedException ignore) {ignore.printStackTrace();}
+	public synchronized boolean acquire() {
+		if (acquired) {
+			return false;
 		}
 		acquired = true;	
+		return true;
 	}
 	
 	
 	public synchronized void release() {
+		if (!acquired) {
+			System.err.println("Something isn't right here, you're attempting to release chopsticks that aren't acquired");
+		}
 		acquired = false;
-		notifyAll();	
 	}
 	
 	public synchronized boolean isAcquired() {

@@ -17,7 +17,7 @@ public class Philosopher implements Runnable{
 	 */
 	Philosopher(int name, Chopstick[] allChopsticks){ 
 		int numberOfChopstickOne = name;
-		int numberOfChopstickTwo = (name+1)%5;
+		int numberOfChopstickTwo = (name+1)%allChopsticks.length;
 		
 		if(numberOfChopstickOne>numberOfChopstickTwo){
 			chopstick1 = allChopsticks[numberOfChopstickTwo];
@@ -44,7 +44,6 @@ public class Philosopher implements Runnable{
 			philosophize();
 			eat();
 		}
-			
 	}
 	
 	/**
@@ -60,16 +59,19 @@ public class Philosopher implements Runnable{
 	 */
 	public void eat() {
 		long randomTime = getTime();
-		try{
-			getSomeChopsticks(chopstick1,chopstick2);
+		if(getSomeChopsticks()) {
+			 System.out.println(philosopherThread.getName() + " Ate");
 			eatCount++;
-			DiningPhilosophers.delay(randomTime, "error while philosopher " + philosopherThread.getName()+ "tried to eat");
-		}catch(Exception e){
-			System.out.println(philosopherThread.getName()+" could not get a chopstick");
-			e.printStackTrace();
-		}finally{
+			try {
+				Thread.sleep(randomTime);
+			} catch (InterruptedException e) {
+				System.err.println("Failed to sleep while eating");
+			}
 			chopstick1.release();
 			chopstick2.release();			
+		}
+		else {
+			System.out.println(philosopherThread.getName()+" could not get a chopstick" );
 		}
 	}
 	
@@ -117,9 +119,25 @@ public class Philosopher implements Runnable{
 	 * If one of the chopsticks is currently acquired, the philosopher will wait for it. There is no circular dependency because
 	 * the first philosopher will always get his/her two chopsticks.
 	 */
-	private static synchronized void getSomeChopsticks(Chopstick chopstick1, Chopstick chopstick2) {
+	private boolean getSomeChopsticks() {
 		//acquire the left and right chopstick
-		chopstick1.acquire();
-		chopstick2.acquire();
+		boolean successOne = false;
+		boolean successTwo = false;
+		if (!chopstick1.isAcquired() && !chopstick2.isAcquired()) {
+			successOne = chopstick1.acquire();
+			successTwo = chopstick2.acquire();
+		}
+		if (successOne&&successTwo) {
+			return true;
+		}
+		else if (successOne) {
+			 System.out.println(philosopherThread.getName() + " Failed to get " + chopstick2.chopStickNum);
+			chopstick1.release();
+		}
+		else if (successTwo) {
+			System.out.println(philosopherThread.getName() + " Failed to get " + chopstick1.chopStickNum);
+			chopstick2.release();
+		}
+		return false;
 	}
 }
